@@ -5,20 +5,20 @@ import FavLink from "./FavLink";
 export default function Navbar() {
   return (
     <header className="sticky top-0 z-30 border-b border-white/40 bg-white/30 backdrop-blur-md">
-      <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3">
+      <nav className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-4">
         <Link
           href="/"
-          className="flex cursor-pointer items-end gap-1.5 font-display text-2xl font-extrabold text-ink"
+          className="flex shrink-0 cursor-pointer items-end gap-1 font-display text-xl font-extrabold text-ink sm:gap-1.5 sm:text-2xl"
         >
-          <CatPeek className="h-7 w-11" body="#fde68a" accent="#fbcfe8" />
+          <CatPeek className="h-6 w-9 sm:h-7 sm:w-11" body="#fde68a" accent="#fbcfe8" />
           Meow<span className="text-pink-400">Index</span>
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Link
             href="/random"
             aria-label="Surprise me — random cat"
             title="Surprise me — random cat"
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-[3px] border-white bg-white/70 shadow-clay-sm transition duration-200 hover:-translate-y-0.5 hover:rotate-12 focus-visible:outline focus-visible:outline-4 focus-visible:outline-babyblue"
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-[3px] border-white bg-white/70 shadow-clay-sm transition duration-200 hover:-translate-y-0.5 hover:rotate-12 focus-visible:outline focus-visible:outline-4 focus-visible:outline-babyblue sm:h-10 sm:w-10"
           >
             <svg
               viewBox="0 0 24 24"
@@ -46,9 +46,10 @@ export default function Navbar() {
           <FavLink />
           <Link
             href="/cats"
-            className="cursor-pointer rounded-full border-[3px] border-white bg-blossom/70 px-5 py-2 font-display text-sm font-bold text-ink shadow-clay-sm transition duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-4 focus-visible:outline-babyblue"
+            className="cursor-pointer whitespace-nowrap rounded-full border-[3px] border-white bg-blossom/70 px-4 py-2 font-display text-sm font-bold text-ink shadow-clay-sm transition duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-4 focus-visible:outline-babyblue sm:px-5"
           >
-            Browse cats
+            <span className="hidden sm:inline">Browse cats</span>
+            <span className="sm:hidden">Cats</span>
           </Link>
         </div>
       </nav>
