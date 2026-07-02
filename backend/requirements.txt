@@ -2,6 +2,7 @@ fastapi
 uvicorn[standard]
 sqlalchemy[asyncio]
 asyncpg
+anthropic
 google-genai
 httpx
 beautifulsoup4
