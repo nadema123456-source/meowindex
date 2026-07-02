@@ -22,7 +22,7 @@ export default function FavLink() {
     <Link
       href="/favorites"
       aria-label={`My favorites (${count})`}
-      className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-[3px] border-white bg-white/70 shadow-clay-sm transition duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-4 focus-visible:outline-babyblue"
+      className="relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-[3px] border-white bg-white/70 shadow-clay-sm transition duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-4 focus-visible:outline-babyblue sm:h-10 sm:w-10"
     >
       <svg
         viewBox="0 0 24 24"
