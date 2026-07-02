@@ -34,7 +34,7 @@ Each cat object must have these fields:
 - page (integer: the PAGE number from the "===== PAGE N =====" marker of the page where this cat appears)
 - name (string)
 - gender (string: "female" or "male")
-- age_text (string: age as shown on page, e.g. "2 roky", "6 měsíců")
+- age_text (string or null: NORMALIZED age estimate in short English, derived from any age/birth info on the page — e.g. "~2 years", "6 months", "born 2021", "born spring 2024". NEVER output bare or truncated words like "years", "Roky", "Let", "Rok". If no age info exists, use null.)
 - age_category (string: "kitten" if <1 year, "adult" if 1-7 years, "senior" if 7+ years)
 - description (string or null: a natural 1-4 sentence description of the cat's personality, story and situation, TRANSLATED INTO FLUENT ENGLISH from the original Czech text. Preserve the meaning faithfully; do not invent details not on the page. Return null only if the page has no descriptive text for the cat.)
 - tags (array of strings IN ENGLISH: personality traits, suitability – e.g. "friendly", "indoor", "good with kids")

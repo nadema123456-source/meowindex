@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { getStats } from "./api";
-import type { Stats } from "./types";
+import { getCats, getStats } from "./api";
+import type { Cat, Stats } from "./types";
+import { displayAge } from "./format";
 import {
   CatSitting,
   CatLoaf,
@@ -8,6 +9,7 @@ import {
   Paw,
   Heart,
 } from "@/components/CatDoodle";
+import CzechMap from "@/components/CzechMap";
 
 export const dynamic = "force-dynamic";
 
@@ -38,10 +40,34 @@ const CAT_FACTS = [
   },
 ];
 
+const HERO_TILTS = ["-rotate-6", "rotate-3", "rotate-6"];
+
 export default async function LandingPage() {
   let stats: Stats | null = null;
+  let heroCats: Cat[] = [];
+  let catOfDay: Cat | null = null;
+
   try {
-    stats = await getStats();
+    const [s, list] = await Promise.all([
+      getStats(),
+      getCats({ per_page: "100" }),
+    ]);
+    stats = s;
+
+    const withPhoto = list.cats.filter((c) => c.image_url);
+    // Urgent cats first in the hero collage — they need the visibility most.
+    const urgentFirst = [
+      ...withPhoto.filter((c) => c.tags.some((t) => /urgent/i.test(t))),
+      ...withPhoto.filter((c) => !c.tags.some((t) => /urgent/i.test(t))),
+    ];
+    heroCats = urgentFirst.slice(0, 3);
+
+    // Cat of the day: deterministic per calendar day, needs photo + story.
+    const storyCats = withPhoto.filter((c) => c.description);
+    if (storyCats.length > 0) {
+      const dayIndex = Math.floor(Date.now() / 86_400_000) % storyCats.length;
+      catOfDay = storyCats[dayIndex];
+    }
   } catch {
     stats = null;
   }
@@ -51,9 +77,7 @@ export default async function LandingPage() {
       {/* full-bleed colorful background — fixed to the viewport so it stretches
           to any window width and stays vivid while scrolling */}
       <div className="pointer-events-none fixed inset-0 -z-10">
-        {/* base pastel wash so nothing is ever plain white */}
         <div className="absolute inset-0 bg-gradient-to-br from-blossom/50 via-butter/40 to-babyblue/50" />
-        {/* blobs spread across the whole viewport (percent-based positions) */}
         <div className="absolute left-[-10%] top-[-12%] h-[34rem] w-[34rem] rounded-full bg-blossom/80 blur-3xl" />
         <div className="absolute right-[-8%] top-[-8%] h-[30rem] w-[30rem] rounded-full bg-babyblue/80 blur-3xl" />
         <div className="absolute left-[18%] top-[28%] h-[26rem] w-[26rem] rounded-full bg-butter/80 blur-3xl" />
@@ -64,7 +88,7 @@ export default async function LandingPage() {
       </div>
 
       {/* ============ HERO ============ */}
-      <section className="grid items-center gap-10 px-4 pb-16 pt-12 sm:pt-16 md:grid-cols-[1.1fr_0.9fr]">
+      <section className="grid items-center gap-10 px-4 pb-16 pt-12 sm:pt-16 md:grid-cols-[1.05fr_0.95fr]">
         <div className="text-center md:text-left">
           <span className="inline-flex items-center gap-2 rounded-full border-[3px] border-white bg-blossom/60 px-4 py-1.5 font-display text-sm font-semibold text-ink shadow-clay-sm">
             <Paw className="h-4 w-4" fill="#403d4d" />
@@ -104,17 +128,13 @@ export default async function LandingPage() {
             >
               Browse cats →
             </Link>
-            <div className="flex items-center gap-2 text-sm font-semibold text-ink/60">
-              <Heart className="h-5 w-5" fill="#f9a8d4" />
-              {stats ? `${stats.total_cats} cats waiting` : "cats waiting"}
-            </div>
           </div>
 
           {/* stat pills */}
           <div className="mt-10 flex flex-wrap justify-center gap-4 md:justify-start">
             <StatPill
               value={stats ? stats.total_cats : "—"}
-              label="cats in the catalog"
+              label="cats waiting"
               className="bg-butter"
             />
             <StatPill
@@ -126,33 +146,102 @@ export default async function LandingPage() {
           </div>
         </div>
 
-        {/* hero illustration */}
-        <div className="relative mx-auto h-72 w-72 sm:h-80 sm:w-80">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-butter/70 via-blossom/70 to-babyblue/70 shadow-clay" />
-          <CatSitting
-            className="absolute inset-x-0 bottom-2 mx-auto h-64 w-64 motion-safe:animate-float sm:h-72 sm:w-72"
-            body="#fde68a"
-            accent="#fbcfe8"
-          />
-          <CatPeek
-            className="absolute -left-10 top-6 h-20 w-32 -rotate-12 motion-safe:animate-float-slow"
-            body="#fbcfe8"
-            accent="#bfdbfe"
-          />
-          <Paw
-            className="absolute -right-4 top-10 h-8 w-8 rotate-12"
-            fill="#bfdbfe"
-          />
-          <Paw
-            className="absolute -left-6 bottom-10 h-6 w-6 -rotate-12"
-            fill="#f9a8d4"
-          />
-          <Heart
-            className="absolute right-2 -top-4 h-9 w-9 motion-safe:animate-wiggle"
-            fill="#f9a8d4"
-          />
+        {/* hero: real cats above the fold */}
+        <div className="relative mx-auto w-full max-w-md">
+          {heroCats.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4 p-6">
+              {heroCats.map((cat, i) => (
+                <Link
+                  key={cat.id}
+                  href={`/cats/${cat.id}`}
+                  className={`group relative cursor-pointer overflow-hidden rounded-3xl border-[4px] border-white shadow-clay transition duration-200 hover:z-10 hover:scale-105 ${HERO_TILTS[i % HERO_TILTS.length]} ${i === 2 ? "col-span-2 -mt-2 h-44" : "h-44"}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={cat.image_url!}
+                    alt={cat.name}
+                    className="h-full w-full object-cover"
+                  />
+                  <span className="absolute bottom-2 left-2 rounded-full bg-white/90 px-3 py-0.5 font-display text-sm font-bold text-ink shadow">
+                    {cat.name}
+                  </span>
+                  {cat.tags.some((t) => /urgent/i.test(t)) && (
+                    <span className="absolute right-2 top-2 rounded-full bg-orange-200 px-2.5 py-0.5 text-xs font-bold text-orange-950 shadow">
+                      urgent
+                    </span>
+                  )}
+                </Link>
+              ))}
+              <CatPeek
+                className="absolute -top-8 right-2 h-16 w-28 motion-safe:animate-float-slow"
+                body="#fbcfe8"
+                accent="#bfdbfe"
+              />
+              <Heart
+                className="absolute -left-4 top-1/3 h-8 w-8 motion-safe:animate-wiggle"
+                fill="#f9a8d4"
+              />
+              <Paw className="absolute -right-3 bottom-8 h-7 w-7 rotate-12" fill="#bfdbfe" />
+            </div>
+          ) : (
+            /* fallback when API is unreachable: keep the illustration */
+            <div className="relative mx-auto h-72 w-72 sm:h-80 sm:w-80">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-butter/70 via-blossom/70 to-babyblue/70 shadow-clay" />
+              <CatSitting
+                className="absolute inset-x-0 bottom-2 mx-auto h-64 w-64 motion-safe:animate-float sm:h-72 sm:w-72"
+                body="#fde68a"
+                accent="#fbcfe8"
+              />
+            </div>
+          )}
         </div>
       </section>
+
+      {/* ============ CAT OF THE DAY ============ */}
+      {catOfDay && (
+        <section className="px-4 pb-16">
+          <div className="relative overflow-hidden rounded-5xl border-[3px] border-white bg-gradient-to-r from-butter/80 via-blossom/70 to-babyblue/70 shadow-clay">
+            <div className="grid items-center gap-6 p-7 sm:grid-cols-[auto_1fr] sm:p-9">
+              <Link
+                href={`/cats/${catOfDay.id}`}
+                className="group relative mx-auto block h-48 w-48 shrink-0 cursor-pointer overflow-hidden rounded-4xl border-[4px] border-white shadow-clay sm:h-56 sm:w-56"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={catOfDay.image_url!}
+                  alt={catOfDay.name}
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </Link>
+              <div className="text-center sm:text-left">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1 font-display text-sm font-bold text-ink shadow-clay-sm">
+                  <Heart className="h-4 w-4" fill="#f9a8d4" />
+                  Cat of the day
+                </span>
+                <h2 className="mt-3 font-display text-3xl font-extrabold text-ink sm:text-4xl">
+                  {catOfDay.name}
+                </h2>
+                <p className="mx-auto mt-2 max-w-xl text-ink/75 sm:mx-0">
+                  {catOfDay.description!.split(". ")[0]}.
+                  {displayAge(catOfDay.age_text) &&
+                    ` ${displayAge(catOfDay.age_text)}.`}
+                </p>
+                <Link
+                  href={`/cats/${catOfDay.id}`}
+                  className="mt-5 inline-block cursor-pointer rounded-full border-[3px] border-white bg-ink px-7 py-3 font-display font-bold text-white shadow-clay transition duration-200 hover:-translate-y-0.5 hover:bg-ink/90"
+                >
+                  Meet {catOfDay.name} →
+                </Link>
+              </div>
+            </div>
+            <CatLoaf
+              className="absolute -bottom-2 right-6 hidden h-16 w-24 sm:block"
+              body="#fffdf8"
+              accent="#fbcfe8"
+            />
+          </div>
+        </section>
+      )}
 
       {/* ============ HOW IT WORKS ============ */}
       <section className="px-4 pb-16">
@@ -179,6 +268,38 @@ export default async function LandingPage() {
             text="Every cat links straight to its shelter page — reach out and visit."
             className="bg-babyblue/70"
           />
+        </div>
+      </section>
+
+      {/* ============ SHELTER MAP ============ */}
+      <section className="px-4 pb-16">
+        <div className="rounded-5xl border-[3px] border-white bg-white/70 p-7 shadow-clay backdrop-blur sm:p-9">
+          <div className="grid items-center gap-8 md:grid-cols-[1fr_1.2fr]">
+            <div className="text-center md:text-left">
+              <h2 className="font-display text-3xl font-extrabold sm:text-4xl">
+                Shelters across Czechia
+              </h2>
+              <p className="mt-3 text-ink/70">
+                {stats
+                  ? `${stats.total_shelters} shelters and counting — from Plzeň to Poděbrady.`
+                  : "From Plzeň to Poděbrady and beyond."}{" "}
+                New sources are added as we grow.
+              </p>
+              <div className="mt-5 flex flex-wrap justify-center gap-2 md:justify-start">
+                {["Praha", "Plzeň", "Poděbrady", "Středočeský kraj"].map(
+                  (city) => (
+                    <span
+                      key={city}
+                      className="rounded-full bg-babyblue/50 px-3 py-1 text-sm font-semibold text-ink"
+                    >
+                      {city}
+                    </span>
+                  ),
+                )}
+              </div>
+            </div>
+            <CzechMap className="w-full" />
+          </div>
         </div>
       </section>
 
