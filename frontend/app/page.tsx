@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCats, getStats } from "./api";
 import type { Cat, Stats } from "./types";
 import { displayAge } from "./format";
+import { pickFacts } from "./catFacts";
 import {
   CatSitting,
   CatLoaf,
@@ -13,31 +14,13 @@ import CzechMap from "@/components/CzechMap";
 
 export const dynamic = "force-dynamic";
 
-const CAT_FACTS = [
-  {
-    fact: "Cats sleep 12–16 hours a day — that's about 70% of their life spent napping.",
-    bg: "bg-butter",
-  },
-  {
-    fact: "A group of cats is called a “clowder”, and a group of kittens a “kindle”.",
-    bg: "bg-blossom",
-  },
-  {
-    fact: "A cat's purr vibrates at 25–150 Hz — frequencies shown to promote healing.",
-    bg: "bg-babyblue",
-  },
-  {
-    fact: "Cats have 32 muscles in each ear and can rotate them 180 degrees.",
-    bg: "bg-mint",
-  },
-  {
-    fact: "Adult cats meow almost exclusively at humans — not at other cats.",
-    bg: "bg-lilac",
-  },
-  {
-    fact: "A cat's nose print is unique, just like a human fingerprint.",
-    bg: "bg-peach",
-  },
+const FACT_COLORS = [
+  "bg-butter",
+  "bg-blossom",
+  "bg-babyblue",
+  "bg-mint",
+  "bg-lilac",
+  "bg-peach",
 ];
 
 const HERO_TILTS = ["-rotate-6", "rotate-3", "rotate-6"];
@@ -269,6 +252,14 @@ export default async function LandingPage() {
             className="bg-babyblue/70"
           />
         </div>
+        <p className="mt-6 text-center">
+          <Link
+            href="/adopt"
+            className="cursor-pointer font-display text-lg font-bold text-ink underline decoration-blossom decoration-4 underline-offset-8 transition hover:decoration-babyblue"
+          >
+            Read the full guide: Adopt responsibly →
+          </Link>
+        </p>
       </section>
 
       {/* ============ SHELTER MAP ============ */}
@@ -315,14 +306,14 @@ export default async function LandingPage() {
           A few purr-fectly true cat facts while you browse.
         </p>
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {CAT_FACTS.map((f, i) => (
+          {pickFacts(6).map((fact, i) => (
             <div
               key={i}
-              className={`relative rounded-4xl border-[3px] border-white p-6 shadow-clay transition duration-200 hover:-translate-y-1 ${f.bg}`}
+              className={`relative rounded-4xl border-[3px] border-white p-6 shadow-clay transition duration-200 hover:-translate-y-1 ${FACT_COLORS[i % FACT_COLORS.length]}`}
             >
               <Paw className="h-6 w-6" fill="rgba(64,61,77,0.8)" />
               <p className="mt-3 font-medium leading-relaxed text-ink">
-                {f.fact}
+                {fact}
               </p>
             </div>
           ))}

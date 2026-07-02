@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Paw } from "./CatDoodle";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -13,8 +14,13 @@ export default function Footer() {
               MeowIndex
             </p>
             <p className="mt-1 max-w-sm">
-              Cats aggregated from public Czech shelter websites. Please adopt
-              responsibly.
+              Cats aggregated from public Czech shelter websites.{" "}
+              <Link
+                href="/adopt"
+                className="cursor-pointer font-semibold text-ink underline-offset-4 hover:underline"
+              >
+                Please adopt responsibly →
+              </Link>
             </p>
           </div>
         </div>
