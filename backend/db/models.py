@@ -50,6 +50,9 @@ class Cat(Base):
     tags: Mapped[list[str]] = mapped_column(JSONB, default=list)
     image_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     source_url: Mapped[str] = mapped_column(String(1024), default="")
+    # Listing page the cat was found on — drives incremental refresh and
+    # "no longer listed -> adopted" detection.
+    listing_url: Mapped[str] = mapped_column(String(1024), default="")
     status: Mapped[str] = mapped_column(String(32), default="available")
     scraped_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
@@ -68,8 +71,21 @@ class Cat(Base):
         Index("ix_cats_age_category", "age_category"),
         Index("ix_cats_status", "status"),
         Index("ix_cats_shelter_id", "shelter_id"),
-        # Dedup guard: the same cat re-scraped updates its row. Composite with
-        # name so cats sharing a listing-page URL (shelters without per-cat
-        # profile pages) don't overwrite each other.
-        Index("uq_cats_source_url_name", "source_url", "name", unique=True),
+        Index("ix_cats_listing_url", "listing_url"),
+        # Dedup guard: unique on (source_url, lower(name)) — case-insensitive
+        # because sites/LLM runs disagree on casing ("OSKAR" vs "Oskar").
+        # Created as an expression index in init_db(), not here (create_all
+        # can't express it portably).
+    )
+
+
+class PageSnapshot(Base):
+    """Content fingerprint of a scraped page — unchanged pages skip the LLM."""
+
+    __tablename__ = "page_snapshots"
+
+    url: Mapped[str] = mapped_column(String(1024), primary_key=True)
+    content_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    fetched_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
     )

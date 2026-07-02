@@ -65,9 +65,50 @@ async def init_db(retries: int = 10, delay: float = 3.0) -> None:
                 # constraint trivially (source_url alone used to be unique).
                 await conn.execute(text("DROP INDEX IF EXISTS uq_cats_source_url"))
                 await conn.execute(
+                    text("DROP INDEX IF EXISTS uq_cats_source_url_name")
+                )
+                # Case-insensitive dedup: first drop older duplicates that only
+                # differ by name casing, then enforce (source_url, lower(name)).
+                await conn.execute(
+                    text(
+                        "DELETE FROM cats a USING cats b "
+                        "WHERE a.source_url = b.source_url "
+                        "AND lower(a.name) = lower(b.name) AND a.id <> b.id "
+                        "AND (a.scraped_at < b.scraped_at "
+                        "OR (a.scraped_at = b.scraped_at AND a.id < b.id))"
+                    )
+                )
+                await conn.execute(
                     text(
                         "CREATE UNIQUE INDEX IF NOT EXISTS "
-                        "uq_cats_source_url_name ON cats (source_url, name)"
+                        "uq_cats_source_lower_name "
+                        "ON cats (source_url, lower(name))"
+                    )
+                )
+                # One-off cleanup: SHOUTY names from source sites -> Title Case
+                # (done in Python — SQL initcap mangles Czech diacritics in
+                # C-locale databases).
+                rows = (
+                    await conn.execute(text("SELECT id, name FROM cats"))
+                ).all()
+                for row_id, name in rows:
+                    if isinstance(name, str) and len(name) >= 2 and name.isupper():
+                        await conn.execute(
+                            text("UPDATE cats SET name = :n WHERE id = :i"),
+                            {"n": name.title(), "i": row_id},
+                        )
+                # Incremental scraping: listing_url tracks which page a cat
+                # was found on (create_all doesn't add columns to old tables).
+                await conn.execute(
+                    text(
+                        "ALTER TABLE cats ADD COLUMN IF NOT EXISTS "
+                        "listing_url VARCHAR(1024) NOT NULL DEFAULT ''"
+                    )
+                )
+                await conn.execute(
+                    text(
+                        "CREATE INDEX IF NOT EXISTS ix_cats_listing_url "
+                        "ON cats (listing_url)"
                     )
                 )
             log.info("Database ready at %s", target)

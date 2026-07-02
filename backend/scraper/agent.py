@@ -243,6 +243,7 @@ async def extract_cats(
                 cat["source_url"] = page_url
             elif not cat.get("source_url"):
                 cat["source_url"] = page_url or chunk[0][0]
+            cat["listing_url"] = page_url or chunk[0][0]
             results.append(cat)
 
     return results
