@@ -4,4 +4,5 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Shell form so $PORT from the platform (Railway etc.) is honored; 8000 locally.
+CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}

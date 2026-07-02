@@ -13,6 +13,13 @@ DATABASE_URL = os.getenv(
     "postgresql+asyncpg://postgres:postgres@localhost:5432/meowindex",
 )
 
+# Managed Postgres providers (Railway, Heroku, ...) hand out plain
+# postgres[ql]:// URLs; SQLAlchemy needs the asyncpg driver in the scheme.
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+
 
 class Base(DeclarativeBase):
     """Base class for all ORM models."""
