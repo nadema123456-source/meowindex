@@ -3,6 +3,7 @@ import { Baloo_2 } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PastelBackground from "@/components/PastelBackground";
 
 const baloo = Baloo_2({
   subsets: ["latin", "latin-ext"],
@@ -34,6 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={baloo.variable}>
       <body className="flex min-h-screen flex-col bg-cream text-ink">
+        <PastelBackground />
         <Navbar />
         <main className="w-full flex-1 px-4 py-8 sm:px-6">{children}</main>
         <Footer />

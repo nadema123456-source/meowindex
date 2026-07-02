@@ -57,19 +57,6 @@ export default async function LandingPage() {
 
   return (
     <div className="relative mx-auto max-w-6xl">
-      {/* full-bleed colorful background — fixed to the viewport so it stretches
-          to any window width and stays vivid while scrolling */}
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-blossom/50 via-butter/40 to-babyblue/50" />
-        <div className="absolute left-[-10%] top-[-12%] h-[34rem] w-[34rem] rounded-full bg-blossom/80 blur-3xl" />
-        <div className="absolute right-[-8%] top-[-8%] h-[30rem] w-[30rem] rounded-full bg-babyblue/80 blur-3xl" />
-        <div className="absolute left-[18%] top-[28%] h-[26rem] w-[26rem] rounded-full bg-butter/80 blur-3xl" />
-        <div className="absolute right-[8%] top-[42%] h-[24rem] w-[24rem] rounded-full bg-mint/70 blur-3xl" />
-        <div className="absolute left-[-8%] bottom-[-14%] h-[30rem] w-[30rem] rounded-full bg-lilac/70 blur-3xl" />
-        <div className="absolute right-[22%] bottom-[-10%] h-[24rem] w-[24rem] rounded-full bg-peach/70 blur-3xl" />
-        <div className="absolute left-[45%] top-[5%] h-72 w-72 rounded-full bg-mint/50 blur-3xl" />
-      </div>
-
       {/* ============ HERO ============ */}
       <section className="grid items-center gap-10 px-4 pb-16 pt-12 sm:pt-16 md:grid-cols-[1.05fr_0.95fr]">
         <div className="text-center md:text-left">
