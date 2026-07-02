@@ -12,8 +12,12 @@ router = APIRouter(prefix="/api/v1/stats", tags=["stats"])
 
 @router.get("", response_model=Stats)
 async def get_stats(session: AsyncSession = Depends(get_session)) -> Stats:
+    # Count only adoptable cats so the landing figure matches the catalog's
+    # default (status=available) view.
     total_cats = (
-        await session.execute(select(func.count()).select_from(Cat))
+        await session.execute(
+            select(func.count()).select_from(Cat).where(Cat.status == "available")
+        )
     ).scalar_one()
     total_shelters = (
         await session.execute(select(func.count()).select_from(Shelter))

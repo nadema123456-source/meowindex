@@ -11,8 +11,19 @@ const baloo = Baloo_2({
 });
 
 export const metadata: Metadata = {
-  title: "MeowIndex",
-  description: "Cat adoption aggregator from Czech shelters",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  ),
+  title: {
+    default: "MeowIndex — cat adoption from Czech shelters",
+    template: "%s | MeowIndex",
+  },
+  description:
+    "Adoptable cats from shelters across Czechia in one colorful catalog — updated automatically, free to browse.",
+  openGraph: {
+    siteName: "MeowIndex",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
