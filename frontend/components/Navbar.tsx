@@ -3,7 +3,7 @@ import { CatPeek } from "./CatDoodle";
 
 export default function Navbar() {
   return (
-    <header className="sticky top-0 z-30 border-b border-black/5 bg-cream/80 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-white/40 bg-white/30 backdrop-blur-md">
       <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3">
         <Link
           href="/"
