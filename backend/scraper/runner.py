@@ -109,12 +109,11 @@ def normalize_cat(raw: dict, shelter: Shelter) -> dict | None:
 
 
 async def upsert_cat(session: AsyncSession, payload: dict) -> None:
-    """Insert or update on source_url conflict (re-scrape refreshes the row)."""
+    """Insert or update on (source_url, name) conflict — re-scrape refreshes."""
     stmt = pg_insert(Cat).values(**payload)
     update_cols = {
         col: stmt.excluded[col]
         for col in (
-            "name",
             "gender",
             "age_text",
             "age_category",
@@ -128,7 +127,7 @@ async def upsert_cat(session: AsyncSession, payload: dict) -> None:
         )
     }
     stmt = stmt.on_conflict_do_update(
-        index_elements=["source_url"], set_=update_cols
+        index_elements=["source_url", "name"], set_=update_cols
     )
     await session.execute(stmt)
 

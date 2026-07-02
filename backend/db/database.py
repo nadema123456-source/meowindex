@@ -53,10 +53,23 @@ async def init_db(retries: int = 10, delay: float = 3.0) -> None:
     url = make_url(DATABASE_URL)
     target = f"{url.host}:{url.port or 5432}/{url.database}"
 
+    from sqlalchemy import text
+
     for attempt in range(1, retries + 1):
         try:
             async with engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
+                # Idempotent index migration: dedup key moved from source_url
+                # to (source_url, name) so cats sharing a listing-page URL
+                # don't overwrite each other. Old data satisfies the new
+                # constraint trivially (source_url alone used to be unique).
+                await conn.execute(text("DROP INDEX IF EXISTS uq_cats_source_url"))
+                await conn.execute(
+                    text(
+                        "CREATE UNIQUE INDEX IF NOT EXISTS "
+                        "uq_cats_source_url_name ON cats (source_url, name)"
+                    )
+                )
             log.info("Database ready at %s", target)
             return
         except Exception as exc:  # noqa: BLE001 - retry transient startup errors

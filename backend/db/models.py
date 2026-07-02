@@ -68,6 +68,8 @@ class Cat(Base):
         Index("ix_cats_age_category", "age_category"),
         Index("ix_cats_status", "status"),
         Index("ix_cats_shelter_id", "shelter_id"),
-        # Dedup guard: same cat profile from the same source shouldn't double-insert.
-        Index("uq_cats_source_url", "source_url", unique=True),
+        # Dedup guard: the same cat re-scraped updates its row. Composite with
+        # name so cats sharing a listing-page URL (shelters without per-cat
+        # profile pages) don't overwrite each other.
+        Index("uq_cats_source_url_name", "source_url", "name", unique=True),
     )
