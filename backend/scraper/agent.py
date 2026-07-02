@@ -1,7 +1,7 @@
 """AI scraper agent.
 
 Fetches a shelter page, strips it down to readable content, hands the text to
-Google Gemini, and parses back a structured list of cats.
+an LLM (Anthropic Claude or Google Gemini), and parses back structured cats.
 """
 import asyncio
 import json
@@ -10,17 +10,25 @@ import re
 
 import httpx
 from bs4 import BeautifulSoup
-from google import genai
-from google.genai import errors, types
 
 # Transient statuses worth retrying: rate limit + server overload/unavailable.
 RETRYABLE_STATUS = {429, 500, 502, 503, 504}
 MAX_RETRIES = int(os.getenv("SCRAPER_MAX_RETRIES", "4"))
 
-# Flash is the sweet spot for high-volume structured extraction: strong enough
-# to read messy Czech shelter markup, cheap and fast enough to run across many
-# pages. Override with SCRAPER_MODEL if you want a different Gemini model.
-MODEL = os.getenv("SCRAPER_MODEL", "gemini-2.5-flash")
+# Provider: Anthropic when its key is present (or SCRAPER_PROVIDER=anthropic),
+# Gemini otherwise. Default models are the cheap high-volume tier of each —
+# structured extraction doesn't need a frontier model.
+def _resolve_provider() -> str:
+    explicit = (os.getenv("SCRAPER_PROVIDER") or "").strip().lower()
+    if explicit in ("anthropic", "gemini"):
+        return explicit
+    return "anthropic" if os.getenv("ANTHROPIC_API_KEY") else "gemini"
+
+
+PROVIDER = _resolve_provider()
+DEFAULT_MODELS = {"anthropic": "claude-haiku-4-5", "gemini": "gemini-2.5-flash"}
+MODEL = os.getenv("SCRAPER_MODEL") or DEFAULT_MODELS[PROVIDER]
+MAX_OUTPUT_TOKENS = int(os.getenv("SCRAPER_MAX_OUTPUT_TOKENS", "16000"))
 MAX_CONTENT_CHARS = 60_000  # keep per-page text bounded; trim very large pages
 
 # Batching: pack several pages' text into a single Gemini request to minimise the
@@ -45,28 +53,53 @@ Each cat object must have these fields:
 If a field is not available, use null. Do NOT invent data."""
 
 
-def _build_client() -> genai.Client:
-    """Build a Google Gemini client.
+async def _generate_anthropic(prompt: str) -> str:
+    """One extraction call via the Anthropic API (SDK auto-retries 429/5xx)."""
+    from anthropic import AsyncAnthropic
 
-    The API key is read from GEMINI_API_KEY (or GOOGLE_API_KEY as a fallback).
-    Get one for free at https://aistudio.google.com/apikey.
-    """
+    if not os.getenv("ANTHROPIC_API_KEY"):
+        raise RuntimeError(
+            "No Anthropic API key found. Set ANTHROPIC_API_KEY (get one at "
+            "https://console.anthropic.com)."
+        )
+    client = AsyncAnthropic(max_retries=MAX_RETRIES)
+    message = await client.messages.create(
+        model=MODEL,
+        max_tokens=MAX_OUTPUT_TOKENS,
+        system=SYSTEM_PROMPT,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return "".join(
+        block.text for block in message.content if block.type == "text"
+    )
+
+
+async def _generate_gemini(prompt: str) -> str:
+    """One extraction call via Gemini, retrying transient 429/5xx ourselves."""
+    from google import genai
+    from google.genai import errors, types
+
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise RuntimeError(
             "No Google API key found. Set GEMINI_API_KEY (get one at "
             "https://aistudio.google.com/apikey)."
         )
-    return genai.Client(api_key=api_key)
+    client = genai.Client(api_key=api_key)
 
-
-async def _generate_with_retry(client: genai.Client, **kwargs):
-    """Call Gemini, retrying transient 429/5xx with exponential backoff."""
     delay = 5.0
     last_exc: Exception | None = None
     for attempt in range(MAX_RETRIES + 1):
         try:
-            return await client.aio.models.generate_content(**kwargs)
+            response = await client.aio.models.generate_content(
+                model=MODEL,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                    response_mime_type="application/json",
+                ),
+            )
+            return response.text or ""
         except errors.APIError as exc:
             code = getattr(exc, "code", None)
             if code not in RETRYABLE_STATUS or attempt == MAX_RETRIES:
@@ -76,6 +109,13 @@ async def _generate_with_retry(client: genai.Client, **kwargs):
             delay = min(delay * 2, 60.0)
     assert last_exc is not None
     raise last_exc
+
+
+async def _generate_text(prompt: str) -> str:
+    """Route one extraction call to the configured provider."""
+    if PROVIDER == "anthropic":
+        return await _generate_anthropic(prompt)
+    return await _generate_gemini(prompt)
 
 
 def clean_html(html: str, base_url: str) -> str:
@@ -174,14 +214,13 @@ async def extract_cats(
 ) -> list[dict]:
     """Extract cats from many (url, cleaned_text) pages in as few calls as possible.
 
-    Pages are packed into batches (one Gemini request each). Each returned cat
+    Pages are packed into batches (one LLM request each). Each returned cat
     carries the page it came from; we use that to set its source_url:
       - force_source_url=True  -> always the page URL (profile pages: 1 cat = 1 page)
       - force_source_url=False -> the model's per-cat profile link, page URL as fallback
     """
     if not pages:
         return []
-    client = _build_client()
     results: list[dict] = []
 
     for chunk in _chunk_pages(pages):
@@ -191,17 +230,9 @@ async def extract_cats(
         ]
         contents = f"Source: {source_name}\n\n" + "\n\n".join(blocks)
 
-        response = await _generate_with_retry(
-            client,
-            model=MODEL,
-            contents=contents,
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                response_mime_type="application/json",
-            ),
-        )
+        raw = await _generate_text(contents)
 
-        for cat in _extract_json_array(response.text or ""):
+        for cat in _extract_json_array(raw):
             idx = cat.pop("page", None)
             page_url = (
                 chunk[idx][0]

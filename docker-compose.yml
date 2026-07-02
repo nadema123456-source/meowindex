@@ -5,9 +5,11 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/meowindex
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - SCRAPE_API_KEY=${SCRAPE_API_KEY}
-      - SCRAPER_MODEL=${SCRAPER_MODEL:-gemini-2.5-flash}
+      - SCRAPER_PROVIDER=${SCRAPER_PROVIDER:-}
+      - SCRAPER_MODEL=${SCRAPER_MODEL:-}
     depends_on:
       - db
   db:
