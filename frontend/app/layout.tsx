@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PastelBackground from "@/components/PastelBackground";
+import { Analytics } from "@vercel/analytics/next";
 
 const baloo = Baloo_2({
   subsets: ["latin", "latin-ext"],
@@ -39,6 +40,7 @@ export default function RootLayout({
         <Navbar />
         <main className="w-full flex-1 px-4 py-8 sm:px-6">{children}</main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
