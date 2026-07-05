@@ -199,12 +199,7 @@ export default async function CatDetailPage({
             <Paw className="h-6 w-6" fill="#f9a8d4" />
             More cats from {cat.shelter?.name ?? shelterName ?? "this shelter"}
           </h2>
-          <div
-            className="mt-4 grid gap-5"
-            style={{
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            }}
-          >
+          <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {siblings.map((c, i) => (
               <MotionCard key={c.id} index={i}>
                 <CatCard cat={c} />
