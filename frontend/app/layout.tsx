@@ -12,10 +12,16 @@ const baloo = Baloo_2({
   variable: "--font-baloo",
 });
 
+// Absolute base for OG/social URLs: explicit env → Vercel's production
+// domain (set automatically at build) → local dev.
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-  ),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "MeowIndex — cat adoption from Czech shelters",
     template: "%s | MeowIndex",
