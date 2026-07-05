@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Baloo_2 } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -39,6 +40,7 @@ export default function RootLayout({
         <Navbar />
         <main className="w-full flex-1 px-4 py-8 sm:px-6">{children}</main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
