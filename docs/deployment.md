@@ -53,7 +53,7 @@ backend's startup migrations create/upgrade everything on boot
 | Setting | Value |
 |---|---|
 | Root directory | `frontend` |
-| Framework preset | **Next.js** (with "Other" the build fails with *"No Output Directory named 'public'"*) |
+| Framework preset | **Next.js** |
 | Production domain | `meowindex.vercel.app` (deployment-hash URLs are login-protected; share the stable domain) |
 
 Environment variables:
