@@ -38,6 +38,8 @@ Next.js 14 frontend with a pastel claymorphism design. Hosted on Railway
 architecture, API reference, scraper internals, frontend, deployment and local
 development guides.
 
+🏆 **Hackathon submission:** see [SUBMISSION.md](SUBMISSION.md).
+
 ---
 
 *Data is aggregated from public shelter websites. Every cat links back to its
