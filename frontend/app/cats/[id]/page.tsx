@@ -7,6 +7,7 @@ import { displayAge, formatVerified } from "../../format";
 import { CatSitting, Paw } from "@/components/CatDoodle";
 import CatCard from "@/components/CatCard";
 import FavoriteButton from "@/components/FavoriteButton";
+import MotionCard from "@/components/MotionCard";
 import ShareButton from "@/components/ShareButton";
 import { tagStyle } from "@/components/tagStyle";
 
@@ -130,7 +131,7 @@ export default async function CatDetailPage({
             )}
           </div>
 
-          <dl className="grid grid-cols-2 gap-4 rounded-4xl border-[3px] border-white bg-white p-5 shadow-clay-sm">
+          <dl className="grid cursor-default grid-cols-2 gap-4 rounded-4xl border-[3px] border-white bg-white p-5 shadow-clay-sm">
             {meta.map((m) => (
               <div key={m.label}>
                 <dt className="text-xs font-bold uppercase tracking-wider text-muted">
@@ -146,7 +147,7 @@ export default async function CatDetailPage({
               {cat.tags.map((tag, i) => (
                 <span
                   key={tag}
-                  className={`rounded-full px-3 py-1 text-sm font-medium ${tagStyle(tag, i)}`}
+                  className={`cursor-default rounded-full px-3 py-1 text-sm font-medium ${tagStyle(tag, i)}`}
                 >
                   {tag}
                 </span>
@@ -204,8 +205,10 @@ export default async function CatDetailPage({
               gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
             }}
           >
-            {siblings.map((c) => (
-              <CatCard key={c.id} cat={c} />
+            {siblings.map((c, i) => (
+              <MotionCard key={c.id} index={i}>
+                <CatCard cat={c} />
+              </MotionCard>
             ))}
           </div>
         </section>

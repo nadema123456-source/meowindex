@@ -6,6 +6,7 @@ import { getCat, getShelters } from "../api";
 import type { Cat } from "../types";
 import { FAVS_EVENT, getFavorites } from "@/components/favorites";
 import CatCard from "@/components/CatCard";
+import MotionCard from "@/components/MotionCard";
 import { CatLoaf } from "@/components/CatDoodle";
 
 export default function FavoritesPage() {
@@ -95,8 +96,10 @@ export default function FavoritesPage() {
             gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
           }}
         >
-          {cats.map((cat) => (
-            <CatCard key={cat.id} cat={cat} />
+          {cats.map((cat, i) => (
+            <MotionCard key={cat.id} index={i}>
+              <CatCard cat={cat} />
+            </MotionCard>
           ))}
         </div>
       )}
