@@ -54,14 +54,14 @@ backend's startup migrations create/upgrade everything on boot
 |---|---|
 | Root directory | `frontend` |
 | Framework preset | **Next.js** (with "Other" the build fails with *"No Output Directory named 'public'"*) |
-| Production domain | `meowindex-d5we.vercel.app` (deployment-hash URLs are login-protected; share the stable domain) |
+| Production domain | `meowindex.vercel.app` (deployment-hash URLs are login-protected; share the stable domain) |
 
 Environment variables:
 
 | Variable | Value |
 |---|---|
 | `NEXT_PUBLIC_API_URL` | `https://meowindex-production.up.railway.app` |
-| `NEXT_PUBLIC_SITE_URL` | `https://meowindex-d5we.vercel.app` (absolute OG URLs) |
+| `NEXT_PUBLIC_SITE_URL` | `https://meowindex.vercel.app` (absolute OG URLs) |
 
 ## Populating / refreshing production data
 

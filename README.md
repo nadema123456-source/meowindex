@@ -1,120 +1,44 @@
 # MeowIndex 🐱
 
-AI-powered cat adoption aggregator. It scrapes Czech animal-shelter websites,
-uses an LLM (Anthropic Claude by default, Google Gemini as fallback) to turn
-messy HTML into structured data, and serves it through a public REST API and a
-web frontend.
+**Find your purrfect match.** MeowIndex gathers adoptable cats from shelters
+across Czechia into one happy, colorful catalog — kept fresh automatically by
+an AI scraper, and free to browse.
 
-📚 **Full technical documentation lives in [`docs/`](docs/README.md)** —
-architecture, API reference, scraper internals, frontend, deployment and
+🐾 **Live:** https://meowindex.vercel.app
+
+## What it does
+
+- **One catalog for many shelters.** Cats from six Czech shelters (and
+  counting) in a single place, with search, filters, sorting and favorites.
+- **AI-powered scraping.** An LLM reads each shelter's website — no per-site
+  parsers. It extracts every cat, normalizes ages, translates the cats'
+  stories into English, and detects when a cat gets adopted.
+- **Always up to date.** Re-scrapes are incremental: unchanged pages cost
+  nothing, changes flow into the catalog within minutes of a run.
+- **Adopt responsibly.** A built-in [guide](https://meowindex.vercel.app/adopt)
+  on making adoption calm and stress-free for the cat.
+- **Public REST API.** All data is available through a free, documented API —
+  see the [Swagger docs](https://meowindex-production.up.railway.app/docs).
+
+## Highlights
+
+- 🎲 Feeling lucky? The dice in the navbar jumps to a random cat.
+- ❤️ Save favorites locally — no account needed.
+- 🐈 A "Cat of the day", a shelter map of Czechia, and 30 rotating cat facts.
+- 🔍 Filter by age, gender, location, shelter, personality tags — or surface
+  the **urgent** and **longest-waiting** cats first.
+
+## Under the hood
+
+FastAPI + PostgreSQL backend with an Anthropic Claude–powered scraper, and a
+Next.js 14 frontend with a pastel claymorphism design. Hosted on Railway
+(API + DB) and Vercel (web).
+
+📚 **All technical documentation lives in [`docs/`](docs/README.md)** —
+architecture, API reference, scraper internals, frontend, deployment and local
 development guides.
 
-## Architecture
+---
 
-```
-meowindex/
-├── backend/      FastAPI + SQLAlchemy (async) + PostgreSQL
-│   ├── scraper/  AI scraper: fetch HTML → clean → Gemini → structured JSON
-│   ├── db/       async engine, ORM models, seed
-│   └── routers/  REST API endpoints
-├── frontend/     Next.js 14 (App Router) + Tailwind
-└── docker-compose.yml   backend + PostgreSQL for local dev
-```
-
-The project has three parts: the **AI scraper**, the **REST API**, and the
-**frontend**.
-
-## Quick start
-
-### 1. Backend + database (Docker)
-
-```bash
-cp .env.example .env          # set SCRAPE_API_KEY (and optionally ANTHROPIC_API_KEY)
-docker-compose up --build
-```
-
-The API comes up at <http://localhost:8000>. Tables are created automatically
-on startup. Interactive docs: <http://localhost:8000/docs>.
-
-### 2. Run a scrape
-
-This is admin-only and protected by the `X-API-Key` header (`SCRAPE_API_KEY`):
-
-```bash
-curl -X POST http://localhost:8000/api/v1/scrape \
-  -H "X-API-Key: $SCRAPE_API_KEY"
-# → { "cats_scraped": 123, "errors": [] }
-```
-
-Each shelter page is fetched, stripped to its main text, and sent to Gemini with
-a strict extraction prompt. Results are upserted (deduped on `source_url`).
-
-### Gemini API key
-
-The scraper uses the **Google Gemini API**. Get a key (free tier available) at
-<https://aistudio.google.com/apikey>, then set it in `.env`:
-
-```bash
-GEMINI_API_KEY=AIza...
-```
-
-Override the model with `SCRAPER_MODEL` if you like (default `gemini-2.5-flash`).
-
-### 3. Frontend
-
-```bash
-cd frontend
-cp .env.example .env.local     # NEXT_PUBLIC_API_URL=http://localhost:8000
-npm install
-npm run dev
-```
-
-Open <http://localhost:3000>.
-
-## API
-
-| Method | Path | Description |
-| ------ | ---- | ----------- |
-| GET  | `/api/v1/cats` | List cats. Filters: `gender`, `age_category`, `shelter_id`, `location`, `status`, `page`, `per_page`. |
-| GET  | `/api/v1/cats/{id}` | Cat detail (with shelter). |
-| GET  | `/api/v1/shelters` | Shelters with cat counts. |
-| GET  | `/api/v1/stats` | Totals + last scrape time. |
-| POST | `/api/v1/scrape` | Trigger a scrape. Requires `X-API-Key`. |
-
-CORS is open (public API). OpenAPI docs at `/docs`.
-
-Example:
-
-```
-GET http://localhost:8000/api/v1/cats?location=Praha&age_category=kitten
-```
-
-## Environment variables
-
-| Variable | Where | Purpose |
-| -------- | ----- | ------- |
-| `DATABASE_URL` | backend | async Postgres DSN (`postgresql+asyncpg://…`) |
-| `GEMINI_API_KEY` | backend | Google Gemini API key for the scraper |
-| `SCRAPE_API_KEY` | backend | shared secret for `POST /api/v1/scrape` |
-| `SCRAPER_MODEL` | backend (optional) | override the Gemini model (default `gemini-2.5-flash`) |
-| `NEXT_PUBLIC_API_URL` | frontend | base URL of the backend API |
-
-## Database migrations
-
-Tables are auto-created on startup for local dev. Alembic is configured for
-production migrations:
-
-```bash
-cd backend
-alembic revision --autogenerate -m "message"
-alembic upgrade head
-```
-
-## Optional seed
-
-To populate shelters (and one demo cat) without a live scrape:
-
-```bash
-cd backend
-python -m db.seed
-```
+*Data is aggregated from public shelter websites. Every cat links back to its
+shelter — that's where adoption actually happens. Please adopt responsibly.* 🐾
