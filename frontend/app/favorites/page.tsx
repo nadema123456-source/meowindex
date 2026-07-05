@@ -60,12 +60,7 @@ export default function FavoritesPage() {
       </div>
 
       {cats === null ? (
-        <div
-          className="grid gap-5"
-          style={{
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          }}
-        >
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
@@ -90,12 +85,7 @@ export default function FavoritesPage() {
           </Link>
         </div>
       ) : (
-        <div
-          className="grid gap-5"
-          style={{
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          }}
-        >
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {cats.map((cat, i) => (
             <MotionCard key={cat.id} index={i}>
               <CatCard cat={cat} />
