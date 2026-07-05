@@ -6,12 +6,15 @@ and serves it through a public REST API and a Next.js frontend.
 
 | Live | URL |
 |---|---|
-| Frontend | https://meowindex-d5we.vercel.app |
+| Frontend | https://meowindex.vercel.app |
 | API | https://meowindex-production.up.railway.app |
 | API docs (Swagger) | https://meowindex-production.up.railway.app/docs |
 | Repository | https://github.com/nadema123456-source/meowindex |
 
 ## Documentation map
+
+New to the project? Start with **[development.md](development.md)** to run it
+locally, or **[architecture.md](architecture.md)** for the big picture.
 
 | Document | What it covers |
 |---|---|
