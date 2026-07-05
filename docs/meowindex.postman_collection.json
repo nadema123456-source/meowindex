@@ -1,0 +1,117 @@
+{
+  "info": {
+    "name": "MeowIndex Public API",
+    "description": "Free public REST API with adoptable cats from Czech shelters, aggregated and AI-enriched by MeowIndex.\n\nLive base URL: https://meowindex-production.up.railway.app\nInteractive docs: https://meowindex-production.up.railway.app/docs\nFull reference: docs/api.md in the repository.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://meowindex-production.up.railway.app"
+    }
+  ],
+  "item": [
+    {
+      "name": "Stats — catalog totals",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/stats",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "stats"]
+        },
+        "description": "Available cats, shelter count and the timestamp of the last scrape."
+      }
+    },
+    {
+      "name": "Cats — list (default: available, newest first)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/cats?per_page=5",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "cats"],
+          "query": [{ "key": "per_page", "value": "5" }]
+        },
+        "description": "Paginated cat listing. Every cat carries an AI-normalized English age (e.g. \"born spring 2024\") and an English-translated description."
+      }
+    },
+    {
+      "name": "Cats — filtered & sorted (Praha kittens, urgent first)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/cats?location=Praha&age_category=kitten&sort=urgent&per_page=5",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "cats"],
+          "query": [
+            { "key": "location", "value": "Praha" },
+            { "key": "age_category", "value": "kitten" },
+            { "key": "sort", "value": "urgent" },
+            { "key": "per_page", "value": "5" }
+          ]
+        },
+        "description": "Filters: gender, age_category, shelter_id, location, status, search (name), tag. Sorts: newest | longest | urgent."
+      }
+    },
+    {
+      "name": "Cats — fulltext name search",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/cats?search=mar&per_page=5",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "cats"],
+          "query": [
+            { "key": "search", "value": "mar" },
+            { "key": "per_page", "value": "5" }
+          ]
+        },
+        "description": "Case-insensitive substring match on the cat's name."
+      }
+    },
+    {
+      "name": "Cat detail — with shelter info",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/cats/71",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "cats", "71"]
+        },
+        "description": "Single cat joined with its shelter. Swap the id for any id returned by the list endpoint."
+      }
+    },
+    {
+      "name": "Shelters — with cat counts",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/shelters",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "shelters"]
+        },
+        "description": "All aggregated shelters and how many cats each one has in the index."
+      }
+    },
+    {
+      "name": "Trigger scrape (admin — requires API key)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "<SCRAPE_API_KEY>",
+            "description": "The only write endpoint — key-protected. Returns 401 without a valid key."
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/scrape",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "scrape"]
+        },
+        "description": "Runs the incremental AI scrape (page fingerprints skip unchanged pages). Included for completeness — expect 401 without the key."
+      }
+    }
+  ]
+}

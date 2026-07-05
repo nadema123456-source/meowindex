@@ -2,6 +2,7 @@
 
 Base URL (production): `https://meowindex-production.up.railway.app`
 Interactive docs: `/docs` (Swagger UI), `/redoc`.
+Postman: import [meowindex.postman_collection.json](meowindex.postman_collection.json).
 
 - All responses are JSON. CORS is open to all origins (public API).
 - No authentication for read endpoints; `POST /api/v1/scrape` requires the
