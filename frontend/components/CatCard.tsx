@@ -32,7 +32,7 @@ export default function CatCard({ cat }: { cat: Cat }) {
   return (
     <Link
       href={`/cats/${cat.id}`}
-      className="group flex flex-col overflow-hidden rounded-4xl border border-black/5 bg-white shadow-soft transition duration-200 hover:-translate-y-1 hover:shadow-lg"
+      className="group flex h-full flex-col overflow-hidden rounded-4xl border border-black/5 bg-white shadow-soft transition-shadow duration-200 hover:shadow-lg"
     >
       <div className="relative overflow-hidden">
         {cat.image_url ? (

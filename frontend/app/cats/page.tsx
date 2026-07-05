@@ -4,6 +4,7 @@ import { getCats, getShelters } from "../api";
 import type { Cat, CatList, Shelter } from "../types";
 import CatCard from "@/components/CatCard";
 import CatFilters from "@/components/CatFilters";
+import MotionCard from "@/components/MotionCard";
 import { CatLoaf } from "@/components/CatDoodle";
 
 export const dynamic = "force-dynamic";
@@ -177,8 +178,10 @@ export default async function CatsPage({
             gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
           }}
         >
-          {cats.map((cat) => (
-            <CatCard key={cat.id} cat={cat} />
+          {cats.map((cat, i) => (
+            <MotionCard key={cat.id} index={i}>
+              <CatCard cat={cat} />
+            </MotionCard>
           ))}
         </div>
       )}

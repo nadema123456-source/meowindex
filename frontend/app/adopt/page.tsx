@@ -101,8 +101,9 @@ export default function AdoptGuidePage() {
           Adopt responsibly
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-ink/70">
-          Adoption changes two lives — yours and the cat's. These few rules
-          make the change joyful instead of stressful, especially for the cat.
+          Adoption changes two lives — yours and the cat&apos;s. These few
+          rules make the change joyful instead of stressful, especially for
+          the cat.
         </p>
       </section>
 

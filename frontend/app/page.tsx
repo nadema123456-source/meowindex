@@ -3,6 +3,7 @@ import { getCats, getStats } from "./api";
 import type { Cat, Stats } from "./types";
 import { displayAge } from "./format";
 import { pickFacts } from "./catFacts";
+import Reveal from "@/components/Reveal";
 import {
   CatSitting,
   CatLoaf,
@@ -58,9 +59,10 @@ export default async function LandingPage() {
   return (
     <div className="relative mx-auto max-w-6xl">
       {/* ============ HERO ============ */}
-      <section className="grid items-center gap-10 px-4 pb-16 pt-12 sm:pt-16 md:grid-cols-[1.05fr_0.95fr]">
+      <section className="px-4 pb-16 pt-12 sm:pt-16">
+        <Reveal className="grid items-center gap-10 md:grid-cols-[1.05fr_0.95fr]">
         <div className="text-center md:text-left">
-          <span className="inline-flex items-center gap-2 rounded-full border-[3px] border-white bg-blossom/60 px-4 py-1.5 font-display text-sm font-semibold text-ink shadow-clay-sm">
+          <span className="inline-flex cursor-default items-center gap-2 rounded-full border-[3px] border-white bg-blossom/60 px-4 py-1.5 font-display text-sm font-semibold text-ink shadow-clay-sm">
             <Paw className="h-4 w-4" fill="#403d4d" />
             Czech cat adoption, all in one place
           </span>
@@ -165,11 +167,13 @@ export default async function LandingPage() {
             </div>
           )}
         </div>
+        </Reveal>
       </section>
 
       {/* ============ CAT OF THE DAY ============ */}
       {catOfDay && (
         <section className="px-4 pb-16">
+          <Reveal>
           <div className="relative overflow-hidden rounded-5xl border-[3px] border-white bg-gradient-to-r from-butter/80 via-blossom/70 to-babyblue/70 shadow-clay">
             <div className="grid items-center gap-6 p-7 sm:grid-cols-[auto_1fr] sm:p-9">
               <Link
@@ -210,11 +214,13 @@ export default async function LandingPage() {
               accent="#fbcfe8"
             />
           </div>
+          </Reveal>
         </section>
       )}
 
       {/* ============ HOW IT WORKS ============ */}
       <section className="px-4 pb-16">
+        <Reveal>
         <h2 className="flex items-center justify-center gap-3 text-center font-display text-3xl font-extrabold sm:text-4xl">
           Adopting is easy
           <Paw className="h-8 w-8" fill="#f9a8d4" />
@@ -247,10 +253,12 @@ export default async function LandingPage() {
             Read the full guide: Adopt responsibly →
           </Link>
         </p>
+        </Reveal>
       </section>
 
       {/* ============ SHELTER MAP ============ */}
       <section className="px-4 pb-16">
+        <Reveal>
         <div className="rounded-5xl border-[3px] border-white bg-white/70 p-7 shadow-clay backdrop-blur sm:p-9">
           <div className="grid items-center gap-8 md:grid-cols-[1fr_1.2fr]">
             <div className="text-center md:text-left">
@@ -268,7 +276,7 @@ export default async function LandingPage() {
                   (city) => (
                     <span
                       key={city}
-                      className="rounded-full bg-babyblue/50 px-3 py-1 text-sm font-semibold text-ink"
+                      className="cursor-default rounded-full bg-babyblue/50 px-3 py-1 text-sm font-semibold text-ink"
                     >
                       {city}
                     </span>
@@ -279,10 +287,12 @@ export default async function LandingPage() {
             <CzechMap className="w-full" />
           </div>
         </div>
+        </Reveal>
       </section>
 
       {/* ============ CAT FACTS ============ */}
       <section className="px-4 pb-16">
+        <Reveal>
         <div className="flex items-end justify-between gap-4">
           <h2 className="font-display text-3xl font-extrabold sm:text-4xl">
             Did you know?
@@ -296,7 +306,7 @@ export default async function LandingPage() {
           {pickFacts(6).map((fact, i) => (
             <div
               key={i}
-              className={`relative rounded-4xl border-[3px] border-white p-6 shadow-clay transition duration-200 hover:-translate-y-1 ${FACT_COLORS[i % FACT_COLORS.length]}`}
+              className={`relative cursor-default rounded-4xl border-[3px] border-white p-6 shadow-clay ${FACT_COLORS[i % FACT_COLORS.length]}`}
             >
               <Paw className="h-6 w-6" fill="rgba(64,61,77,0.8)" />
               <p className="mt-3 font-medium leading-relaxed text-ink">
@@ -305,10 +315,12 @@ export default async function LandingPage() {
             </div>
           ))}
         </div>
+        </Reveal>
       </section>
 
       {/* ============ FINAL CTA ============ */}
       <section className="px-4 pb-20">
+        <Reveal>
         <div className="relative overflow-hidden rounded-5xl border-[3px] border-white bg-gradient-to-r from-blossom via-butter to-babyblue p-10 text-center shadow-clay sm:p-14">
           <CatPeek
             className="absolute -top-1 right-8 hidden h-16 w-28 sm:block"
@@ -330,6 +342,7 @@ export default async function LandingPage() {
             Meet the cats →
           </Link>
         </div>
+        </Reveal>
       </section>
     </div>
   );
@@ -346,7 +359,7 @@ function StatPill({
 }) {
   return (
     <div
-      className={`rounded-3xl border-[3px] border-white px-5 py-3 shadow-clay-sm ${className}`}
+      className={`cursor-default rounded-3xl border-[3px] border-white px-5 py-3 shadow-clay-sm ${className}`}
     >
       <span className="font-display text-2xl font-extrabold text-ink">
         {value}
@@ -369,7 +382,7 @@ function StepCard({
 }) {
   return (
     <div
-      className={`rounded-4xl border-[3px] border-white p-6 shadow-clay transition duration-200 hover:-translate-y-1 ${className}`}
+      className={`cursor-default rounded-4xl border-[3px] border-white p-6 shadow-clay ${className}`}
     >
       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white font-display text-lg font-extrabold text-ink shadow-clay-sm">
         {step}
