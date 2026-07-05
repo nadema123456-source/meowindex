@@ -1,8 +1,13 @@
 # MeowIndex 🐱
 
 AI-powered cat adoption aggregator. It scrapes Czech animal-shelter websites,
-uses Google Gemini to turn messy HTML into structured data, and serves it through a
-public REST API and a web frontend.
+uses an LLM (Anthropic Claude by default, Google Gemini as fallback) to turn
+messy HTML into structured data, and serves it through a public REST API and a
+web frontend.
+
+📚 **Full technical documentation lives in [`docs/`](docs/README.md)** —
+architecture, API reference, scraper internals, frontend, deployment and
+development guides.
 
 ## Architecture
 
