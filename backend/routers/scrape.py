@@ -1,4 +1,5 @@
 """Admin-only scraping trigger endpoint."""
+import hmac
 import os
 
 from fastapi import APIRouter, Depends, Header, HTTPException
@@ -17,7 +18,8 @@ def verify_api_key(x_api_key: str | None = Header(None)) -> None:
         raise HTTPException(
             status_code=500, detail="SCRAPE_API_KEY is not configured on the server"
         )
-    if x_api_key != expected:
+    # Constant-time comparison — a plain `!=` leaks key prefixes via timing.
+    if not (x_api_key and hmac.compare_digest(x_api_key, expected)):
         raise HTTPException(status_code=401, detail="Invalid or missing X-API-Key")
 
 

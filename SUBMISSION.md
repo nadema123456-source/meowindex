@@ -75,12 +75,17 @@ scraper internals, frontend, deployment and development guides.
 
 ## Security
 
-- The only write endpoint (`POST /api/v1/scrape`) is protected by an API key;
-  everything else is read-only by design.
-- ORM-parameterized queries (no raw SQL), Pydantic validation on every input.
-- No secrets in the repository — the entire git history was audited before
-  going public; keys live only in environment variables.
-- Open CORS is intentional: a public, read-only dataset.
+- **Independent Aikido Security audit: top 10 % of Aikido accounts** — full
+  report in [docs/security-report-aikido.pdf](docs/security-report-aikido.pdf),
+  threat model and hardening notes in [docs/security.md](docs/security.md).
+- The only write endpoint (`POST /api/v1/scrape`) is API-key gated with a
+  constant-time comparison; everything else is read-only by design.
+- ORM-parameterized queries (no raw SQL), Pydantic validation on every input,
+  security headers (frame-ancestors, nosniff, referrer/permissions policy) on
+  every frontend response.
+- No secrets in the repository — the entire git history was audited (and
+  scanned by Aikido: 0 findings) before going public.
+- Open CORS is intentional: a public, read-only dataset with no cookies or PII.
 
 ## A 60-second tour for judges
 

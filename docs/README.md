@@ -23,6 +23,7 @@ locally, or **[architecture.md](architecture.md)** for the big picture.
 | [backend.md](backend.md) | FastAPI app, data model, startup migrations |
 | [scraper.md](scraper.md) | The AI scraping pipeline — batching, incremental fingerprints, adopted detection, dedup, costs |
 | [frontend.md](frontend.md) | Next.js app structure, routes, components, design system, animations |
+| [security.md](security.md) | Threat model, hardening, Aikido audit report |
 | [deployment.md](deployment.md) | Railway + Vercel setup, environment variables, deploy flow |
 | [development.md](development.md) | Local setup, everyday commands, verification workflow, known pitfalls |
 
