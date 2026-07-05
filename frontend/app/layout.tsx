@@ -25,6 +25,11 @@ export const metadata: Metadata = {
   openGraph: {
     siteName: "MeowIndex",
     type: "website",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "MeowIndex — find your purrfect match" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og.png"],
   },
 };
 

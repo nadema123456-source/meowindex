@@ -87,6 +87,16 @@ scraper internals, frontend, deployment and development guides.
   scanned by Aikido: 0 findings) before going public.
 - Open CORS is intentional: a public, read-only dataset with no cookies or PII.
 
+## Screenshots
+
+| Landing | Catalog |
+|---|---|
+| ![Landing page](docs/assets/landing.png) | ![Catalog with filters](docs/assets/catalog.png) |
+
+| Cat detail | Adopt responsibly guide |
+|---|---|
+| ![Cat detail](docs/assets/detail.png) | ![Adoption guide](docs/assets/adopt.png) |
+
 ## A 60-second tour for judges
 
 1. **https://meowindex.vercel.app** — the landing page: live stats, Cat of the

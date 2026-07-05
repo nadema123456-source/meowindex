@@ -6,6 +6,8 @@ an AI scraper, and free to browse.
 
 🐾 **Live:** https://meowindex.vercel.app
 
+[![MeowIndex — landing page](docs/assets/landing.png)](https://meowindex.vercel.app)
+
 ## What it does
 
 - **One catalog for many shelters.** Cats from six Czech shelters (and
